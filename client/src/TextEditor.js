@@ -10,7 +10,6 @@ const TOOLBAR_OPTIONS = [
     [{ list: "ordered"}, { list: "bullet"}],
     ["bold", "italic", "underline"],
     [{ color: []}, { background: []}],
-    [{ script: "sub"}, { script: "super"}],
     [{ align: []}],
     ["image", "blockquote", "code-block"],
     ["clean"],
@@ -20,6 +19,7 @@ export default function TextEditor() {
     const [socket, setSocket] = useState()
     const [quill, setQuill] = useState()
 
+    // Setup the connection to the server socket
     useEffect(() => {
         const s = io("http://localhost:3001")
         setSocket(s)
@@ -28,6 +28,35 @@ export default function TextEditor() {
             s.disconnect()
         }
     }, [])
+
+    // Recieve changes from the server and add them to quill
+    useEffect(() => {
+        if(socket == null || quill == null) return
+
+        const handler = (delta) => {
+            quill.updateContents(delta)
+        }
+        socket.on('recieve-changes', handler)
+
+        return () => {
+            socket.off('recieve-change', handler)
+        }
+    }, [socket, quill])
+
+    // Send changes to the server
+    useEffect(() => {
+        if(socket == null || quill == null) return
+
+        const handler = (delta, oldDelta, source) => {
+            if(source !== 'user') return
+            socket.emit("send-changes", delta)
+        }
+        quill.on('text-change', handler)
+
+        return () => {
+            quill.off('text-change', handler)
+        }
+    }, [socket, quill])
 
     // When the html with ref wrapperRef is created execute this code
     const wrapperRef = useCallback((wrapper) => {
