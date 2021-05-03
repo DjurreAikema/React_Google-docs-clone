@@ -1,0 +1,15 @@
+### react ###
+client/.DS_*
+client/*.log
+client/logs
+client/**/*.backup.*
+client/**/*.back.*
+
+client/node_modules
+client/bower_components
+
+client/*.sublime*
+
+client/psd
+client/thumb
+client/sketch
