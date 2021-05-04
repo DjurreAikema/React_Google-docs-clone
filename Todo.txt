@@ -1,0 +1,3 @@
+Save on disconnect
+On home page see all documents that are currently open
+On home page, new document button
